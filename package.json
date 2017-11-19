@@ -1,12 +1,12 @@
 {
   "name": "ioredis-utils",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A handful of utilities for ioredis",
   "main": "lib/index.js",
   "author": "Braden R. Napier",
   "license": "MIT",
   "reveal": true,
-  "files": ["lib"],
+  "files": ["lib", "flowlibs"],
   "repository": {
     "type": "git",
     "url": "https://github.com/Dash-OS/ioredis-utils/"

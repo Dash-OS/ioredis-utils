@@ -1,5 +1,6 @@
 /* @flow */
 import type Redis from 'ioredis';
+import path from 'path';
 
 import type { RegExp$Interface, File$Data } from '../types';
 
@@ -64,11 +65,11 @@ function getScriptParameters(descriptors) {
   }, []);
 }
 
-function getScripts(path: string, recursive?: boolean) {
+function getScripts(directory: string, recursive?: boolean) {
   if (recursive) {
-    return getRecursiveDirectoryFiles(path, luaExtensionFilter);
+    return getRecursiveDirectoryFiles(directory, luaExtensionFilter);
   }
-  return getDirectoryFiles(path, luaExtensionFilter);
+  return getDirectoryFiles(directory, luaExtensionFilter);
 }
 
 function addScriptsToRedis(redis: Redis, scripts: Array<File$Data>) {
@@ -93,10 +94,15 @@ function addScriptsToRedis(redis: Redis, scripts: Array<File$Data>) {
   });
 }
 
-function loadScripts(path: string, recursive?: boolean) {
-  return getScripts(path, recursive)
+function loadScripts(directory: string, recursive?: boolean) {
+  return getScripts(directory, recursive)
     .then(readFileDescriptors)
     .then(getScriptParameters);
+}
+
+function addIncludedScriptsToRedis(redis: Redis) {
+  return loadScripts(path.join(__dirname, 'scripts'), true).then(scripts =>
+    addScriptsToRedis(redis, scripts));
 }
 
 export {
@@ -105,4 +111,5 @@ export {
   getParameter,
   getParameters,
   addScriptsToRedis,
+  addIncludedScriptsToRedis,
 };
