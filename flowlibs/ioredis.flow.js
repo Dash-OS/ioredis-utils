@@ -88,6 +88,14 @@ declare module 'ioredis' {
 
     getBuffer(key: string, callback?: ResCallbackT<Buffer>): Promise<Buffer>;
 
+    // NOTE: These are the custom defined commands added with our lua
+    //       scripts.
+    hsetifeq<K: string, F, V>(
+      key: K,
+      field: F,
+      value: V,
+    ): Promise<Redis$SimpleResult>;
+
     // NOTE: These are complete, replacing the stubbed versions
     //       underneath them.
     hgetall<V>(key: string): Promise<V>;

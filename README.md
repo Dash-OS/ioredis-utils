@@ -96,3 +96,10 @@ import redisInstance from './somewhere';
 
 addDefaultScriptsToRedis(redisInstance);
 ```
+
+##### Include Custom FlowLibs
+
+Since the above will add commands to the redis instance, you may want to use our
+built-in flowlibs which are also published. Simply add
+`./node_modules/ioredis/flowlibs` to the `[libs]` sections of your
+`.flowconfig`.
