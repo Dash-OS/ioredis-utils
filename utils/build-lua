@@ -65,9 +65,9 @@ import { lua } from 'ioredis-utils';
 
 const descriptors: Array<File\$SimpleData> = ${jsObj};
 
-function loadDefaultScripts(redis: Redis) {
+function addDefaultScriptsToRedis(redis: Redis) {
   return lua.addScriptsToRedis(redis, descriptors);
 }
 
-export default loadDefaultScripts;
+export default addDefaultScriptsToRedis;
 "]
