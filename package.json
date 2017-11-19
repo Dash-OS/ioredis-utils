@@ -1,31 +1,21 @@
 {
   "name": "ioredis-utils",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A handful of utilities for ioredis",
   "main": "lib/index.js",
   "author": "Braden R. Napier",
   "license": "MIT",
   "reveal": true,
-  "files": [
-    "lib",
-    "flowlibs",
-    "extras"
-  ],
+  "files": ["lib", "flowlibs", "extras"],
   "repository": {
     "type": "git",
     "url": "https://github.com/Dash-OS/ioredis-utils/"
   },
-  "keywords": [
-    "ioredis",
-    "redis",
-    "utilities",
-    "lua",
-    "parse",
-    "flow"
-  ],
+  "keywords": ["ioredis", "redis", "utilities", "lua", "parse", "flow"],
   "scripts": {
     "flow": "flow",
-    "build": "cross-env NODE_ENV=production rimraf lib registry && npm-run-all prebuild:* && npm-run-all -p build:**",
+    "build":
+      "cross-env NODE_ENV=production rimraf lib registry && npm-run-all prebuild:* && npm-run-all -p build:**",
     "prebuild:lua": "./utils/build-lua",
     "build:src:babel": "babel src/main --out-dir lib",
     "build:extras:babel": "babel src/extras --out-dir extras",
