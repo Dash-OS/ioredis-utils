@@ -45,7 +45,7 @@ json foreach s $descriptors {
     data: '[string map {"\n" "\\n"} [json get $s data]]',"
   if {[json exists $s params]} {
     append jsObj "
-      params: (new Map([json extract $s params]): Map<string, Array<string> | string>)"
+    params: (new Map([json extract $s params]): Map<string, Array<string> | string>)"
   }
   append jsObj "
   \},

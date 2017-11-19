@@ -14,7 +14,7 @@ const descriptors: Array<File$SimpleData> = [
       ext: '.lua',
     },
     data: '-- name:  hsetifeq\n-- keys:  key field value\nlocal value = unpack(redis.call("HMGET", KEYS[1], KEYS[2]))\nlocal check = KEYS[3]\nif value == check then\n  return redis.call("HMSET", KEYS[1], unpack(ARGV))\nelse\n  return nil\nend\n',
-      params: (new Map([["name","hsetifeq"],["keys",["key","field","value"]]]): Map<string, Array<string> | string>)
+    params: (new Map([["name","hsetifeq"],["keys",["key","field","value"]]]): Map<string, Array<string> | string>)
   },
 ];
 
