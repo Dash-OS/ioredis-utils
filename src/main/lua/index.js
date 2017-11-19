@@ -1,8 +1,8 @@
 /* @flow */
 import type Redis from 'ioredis';
-import path from 'path';
+// import path from 'path';
 
-import type { RegExp$Interface, File$Data } from '../types';
+import type { RegExp$Interface, File$Data, File$SimpleData } from '../types';
 
 import {
   getDirectoryFiles,
@@ -72,7 +72,10 @@ function getScripts(directory: string, recursive?: boolean) {
   return getDirectoryFiles(directory, luaExtensionFilter);
 }
 
-function addScriptsToRedis(redis: Redis, scripts: Array<File$Data>) {
+function addScriptsToRedis(
+  redis: Redis,
+  scripts: Array<File$Data | File$SimpleData>,
+) {
   scripts.forEach(script => {
     const { params, data } = script;
     if (params) {
@@ -100,16 +103,10 @@ function loadScripts(directory: string, recursive?: boolean) {
     .then(getScriptParameters);
 }
 
-function addIncludedScriptsToRedis(redis: Redis) {
-  return loadScripts(path.join(__dirname, 'scripts'), true).then(scripts =>
-    addScriptsToRedis(redis, scripts));
-}
-
 export {
   getScripts,
   loadScripts,
   getParameter,
   getParameters,
   addScriptsToRedis,
-  addIncludedScriptsToRedis,
 };

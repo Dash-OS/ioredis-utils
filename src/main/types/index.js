@@ -67,6 +67,17 @@ export type File$Data = {|
   params?: Map<string, Array<string> | string>,
 |};
 
+// reduced size descriptor for pre-compiled scripts
+export type File$SimpleData = {|
+  +descriptor: {
+    name: string,
+    ext: string,
+    file: string,
+  },
+  +data: string | Buffer,
+  params?: Map<string, Array<string> | string>,
+|};
+
 export type FS$LStatPromised = (path: string) => Promise<FS$Stats>;
 
 export type File$FilterDescriptors = (descriptor: File$Descriptor) => boolean;

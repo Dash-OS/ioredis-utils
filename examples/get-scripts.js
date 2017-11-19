@@ -10,16 +10,16 @@
 import path from 'path';
 import { log } from '../utils/log';
 
-import { lua } from '../src';
+import { lua } from '../src/main';
 
 log('Directory: ', __dirname);
 
-lua.getScripts(path.join(__dirname, 'scripts'), true).then(scripts => {
+lua.getScripts(path.resolve(__dirname, '../lua'), true).then(scripts => {
   log('\n\n --- | Get Lua Scripts | ---\n\n');
   log(scripts);
 });
 
-lua.loadScripts(path.join(__dirname, 'scripts'), true).then(scripts => {
+lua.loadScripts(path.resolve(__dirname, '../lua'), true).then(scripts => {
   log('\n\n --- | Load Lua Scripts | ---\n\n');
   scripts.forEach(script => {
     log(script.params);

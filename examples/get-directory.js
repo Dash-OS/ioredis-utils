@@ -12,7 +12,7 @@ import { log } from '../utils/log';
 import {
   getDirectoryFiles,
   getRecursiveDirectoryFiles,
-} from '../src/utils/fsys';
+} from '../src/main/utils/fsys';
 
 log('Directory: ', __dirname);
 

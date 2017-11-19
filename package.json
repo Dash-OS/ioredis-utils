@@ -1,12 +1,12 @@
 {
   "name": "ioredis-utils",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A handful of utilities for ioredis",
   "main": "lib/index.js",
   "author": "Braden R. Napier",
   "license": "MIT",
   "reveal": true,
-  "files": ["lib", "flowlibs"],
+  "files": ["lib", "flowlibs", "extras"],
   "repository": {
     "type": "git",
     "url": "https://github.com/Dash-OS/ioredis-utils/"
@@ -15,12 +15,16 @@
   "scripts": {
     "flow": "flow",
     "build":
-      "cross-env NODE_ENV=production rimraf lib registry && npm-run-all -p build:**",
-    "build:pubchan:babel": "babel src --out-dir lib",
-    "build:pubchan:flow": "flow-copy-source src lib",
+      "cross-env NODE_ENV=production rimraf lib registry && npm-run-all prebuild:* && npm-run-all -p build:**",
+    "prebuild:lua": "./utils/build-lua",
+    "build:src:babel": "babel src/main --out-dir lib",
+    "build:extras:babel": "babel src/extras --out-dir extras",
+    "build:src:flow": "flow-copy-source src/main lib",
+    "build:extras:flow": "flow-copy-source src/extras extras",
     "prepublish": "npm-run-all build"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.0.1",
     "babel-plugin-transform-class-properties": "^6.24.1",

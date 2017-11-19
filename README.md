@@ -80,3 +80,15 @@ else
   return nil
 end
 ```
+
+#### Include Lua Scripts
+
+There are some included and pre-compiled lua scripts with this library. They are
+not used by default and are not imported. You can easily add them if you wish:
+
+```js
+import { lua } from 'ioredis-utils';
+import luaScripts from 'ioredis-utils/extras/scripts';
+
+lua.addScriptsToRedis(redis, luaScripts);
+```
