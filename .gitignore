@@ -4,4 +4,4 @@ scripts
 private
 .DS_Store
 registry/
-.extras/
+./extras/
