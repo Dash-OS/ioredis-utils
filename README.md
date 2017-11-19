@@ -30,3 +30,9 @@ Until Documentation - outline of features implemented
 
 * Reading and Loading of Lua scripts
 * Read comments from lua scripts to determine key names and length
+
+## Examples
+
+Our
+[examples directory](https://github.com/Dash-OS/ioredis-utils/tree/master/examples)
+shows a few tests that should be all working.
