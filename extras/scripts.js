@@ -20,8 +20,8 @@ const descriptors = [{
 // into
 
 
-function loadDefaultScripts(redis) {
+function addDefaultScriptsToRedis(redis) {
   return _ioredisUtils.lua.addScriptsToRedis(redis, descriptors);
 }
 
-exports.default = loadDefaultScripts;
+exports.default = addDefaultScriptsToRedis;

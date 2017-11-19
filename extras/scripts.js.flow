@@ -18,8 +18,8 @@ const descriptors: Array<File$SimpleData> = [
   },
 ];
 
-function loadDefaultScripts(redis: Redis) {
+function addDefaultScriptsToRedis(redis: Redis) {
   return lua.addScriptsToRedis(redis, descriptors);
 }
 
-export default loadDefaultScripts;
+export default addDefaultScriptsToRedis;

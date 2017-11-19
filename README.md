@@ -83,8 +83,12 @@ end
 
 #### Include Lua Scripts
 
-There are some included and pre-compiled lua scripts with this library. They are
-not used by default and are not imported. You can easily add them if you wish:
+There are some included and
+[pre-compiled lua scripts](https://github.com/Dash-OS/ioredis-utils/blob/master/src/extras/scripts.js)
+with this library. They are not used by default and are not imported. They are
+automatically built whenever the package is published from the
+[lua directory](https://github.com/Dash-OS/ioredis-utils/tree/master/lua). You
+can easily add them if you wish:
 
 ```js
 import addDefaultScriptsToRedis from 'ioredis-utils/extras/scripts';
