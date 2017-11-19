@@ -6,16 +6,26 @@
   "author": "Braden R. Napier",
   "license": "MIT",
   "reveal": true,
-  "files": ["lib", "flowlibs", "extras"],
+  "files": [
+    "lib",
+    "flowlibs",
+    "extras"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/Dash-OS/ioredis-utils/"
   },
-  "keywords": ["ioredis", "redis", "utilities", "lua", "parse", "flow"],
+  "keywords": [
+    "ioredis",
+    "redis",
+    "utilities",
+    "lua",
+    "parse",
+    "flow"
+  ],
   "scripts": {
     "flow": "flow",
-    "build":
-      "cross-env NODE_ENV=production rimraf lib registry && npm-run-all prebuild:* && npm-run-all -p build:**",
+    "build": "cross-env NODE_ENV=production rimraf lib registry && npm-run-all prebuild:* && npm-run-all -p build:**",
     "prebuild:lua": "./utils/build-lua",
     "build:src:babel": "babel src/main --out-dir lib",
     "build:extras:babel": "babel src/extras --out-dir extras",
@@ -40,7 +50,7 @@
     "flow-bin": "^0.59.0",
     "flow-copy-source": "^1.2.1",
     "ioredis": "^3.2.1",
-    "ioredis-utils": "^1.0.6",
+    "ioredis-utils": "^1.1.0",
     "npm-run-all": "^4.1.2",
     "rimraf": "^2.6.2",
     "task-handler": "^1.0.13"

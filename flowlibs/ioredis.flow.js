@@ -334,7 +334,7 @@ declare module 'ioredis' {
     time(args: any[], callback: ResCallbackT<any>): void;
     time(...args: any[]): Promise<any>;
     monitor(args: any[], callback: ResCallbackT<any>): void;
-    monitor(...args: any[]): Promise<any>;
+    // monitor(...args: any[]): Promise<any>;
     ttl(args: any[], callback: ResCallbackT<any>): void;
     ttl(...args: any[]): Promise<any>;
     persist(args: any[], callback: ResCallbackT<any>): void;
