@@ -9,6 +9,8 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 //
 // Ported to Flow by Samuel Reed <https://github.com/strml>
+//
+// Partially Compelted by: Braden Napier <https://www.github.com/Dash-OS>
 
 /* =================== USAGE ===================
     import * as Redis from "ioredis";
@@ -42,6 +44,7 @@ declare module 'ioredis' {
       | 'connect'
       | 'ready'
       | 'end';
+
     connect(callback?: Function): Promise<any>;
     disconnect(): void;
     duplicate(): Redis;
