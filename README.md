@@ -67,6 +67,8 @@ need to add them to the arguments each time you call the command.
 
 > If name is not provided it will use the name of the file instead.
 
+Below is an example of a `hsetifeq.lua` script.
+
 ```lua
 -- name:  hsetifeq
 -- keys:  key field value
