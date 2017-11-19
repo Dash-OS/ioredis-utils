@@ -60,3 +60,21 @@ function handleLinkLuaScripts(redis: Redis) {
 
 export default handleLinkLuaScripts;
 ```
+
+The lua scripts should be formatted with comments at the top defining the name
+and keys. If keys are not provided then it will not define them and you will
+need to add them to the arguments each time you call the command.
+
+> If name is not provided it will use the name of the file instead.
+
+```lua
+-- name:  hsetifeq
+-- keys:  key field value
+local value = unpack(redis.call("HMGET", KEYS[1], KEYS[2]))
+local check = KEYS[3]
+if value == check then
+  return redis.call("HMSET", KEYS[1], unpack(ARGV))
+else
+  return nil
+end
+```
