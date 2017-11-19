@@ -9,7 +9,10 @@
 */
 import { log } from '../utils/log';
 
-import { getDirectoryFiles, getRecursiveDirectoryFiles } from '../src/fsys';
+import {
+  getDirectoryFiles,
+  getRecursiveDirectoryFiles,
+} from '../src/utils/fsys';
 
 log('Directory: ', __dirname);
 

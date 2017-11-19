@@ -14,7 +14,13 @@ import { lua } from '../src';
 
 log('Directory: ', __dirname);
 
+lua.getScripts(path.join(__dirname, 'scripts'), true).then(scripts => {
+  log('\n\n --- | Get Lua Scripts | ---\n\n');
+  log(scripts);
+});
+
 lua.loadScripts(path.join(__dirname, 'scripts'), true).then(scripts => {
+  log('\n\n --- | Load Lua Scripts | ---\n\n');
   scripts.forEach(script => {
     log(script.params);
   });
