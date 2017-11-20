@@ -42,17 +42,34 @@ json foreach s $descriptors {
       name: '[json get $s descriptor name]',
       ext: '[json get $s descriptor ext]',
     },
-    data: '[string map {"\n" "\\n"} [json get $s data]]',"
+    data: '[string map {"\n" "\\n" {'} {\'} {"} {\"}} [json get $s data]]',"
+
   if {[json exists $s params]} {
     append jsObj "
-    params: (new Map([json extract $s params]): Map<string, Array<string> | string>)"
+    params: [json extract $s params],"
   }
+
+  if {[json exists $s transforms]} {
+    append jsObj "
+    transforms: {"
+    if {[json exists $s transforms args]} {
+      append jsObj "
+        args: [json get $s transforms args],"
+    }
+    if {[json exists $s transforms result]} {
+      append jsObj "
+        result: [json get $s transforms result],"
+    }
+    append jsObj "
+    },
+    "
+  }
+
   append jsObj "
-  \},
-"
+  \},"
 }
 
-append jsObj "\]"
+append jsObj "\n\]"
 
 ::fileutil::writeFile $luaScriptsJS [string trimleft "
 /* @flow */

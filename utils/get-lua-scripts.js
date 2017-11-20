@@ -16,6 +16,7 @@ function loadScripts() {
       },
       data: String(s.data),
       params: s.params,
+      transforms: s.transforms,
     }));
     console.log(JSON.stringify(formattedScripts));
   });

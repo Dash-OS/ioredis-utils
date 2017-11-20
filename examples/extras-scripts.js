@@ -6,30 +6,22 @@ import { log } from '../utils/log';
 const redis = new Redis();
 
 addDefaultScriptsToRedis(redis);
-
 log('Default Scripts Added!');
 
 console.log(redis.hsetifget);
 
 function startExample() {
-  redis.hset('hash1', 'field1', 'value1').then(() => {
-    log('Field1 Set');
-    redis
-      .hsetifget('hash1', 'field1', 'value2', 'field2', 'value2')
-      .then(results => {
-        log('hsetifget result: ', results);
-        return redis.hsetifget(
-          'hash1',
-          'field1',
-          'value1',
-          'field2',
-          'newvalue',
-        );
-      })
-      .then(results => {
-        log('hsetifget results 2: ', results);
-      });
-  });
+  redis
+    .del('hash1')
+    .then(() => redis.hmset('hash1', { field1: 'value1', isTrue: 1 }))
+    .then(() => redis.hsetifget(
+      'hash1',
+      { field1: 'value1', isTrue: 1 },
+      { field2: 'value2', field3: 'value3' },
+    ))
+    .then(results => {
+      log('hsetifget result: ', results);
+    });
 }
 
 redis.monitor((err, monitor) => {

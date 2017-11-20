@@ -90,19 +90,17 @@ declare module 'ioredis' {
 
     // NOTE: These are the custom defined commands added with our lua
     //       scripts.
-    hsetifeq<K: string, F, V>(
-      key: K,
-      field: F,
-      value: V,
-      ...args: Array<mixed>
+    hsetifeq<K: string, IFE: { [key: string]: * }, TSE: { [key: string]: * }>(
+      hashKey: K,
+      ifEquals: IFE,
+      thenSet: TSE,
     ): Promise<Redis$SimpleResult>;
 
-    hsetifget<K: string, F, V, HV>(
-      key: K,
-      field: F,
-      value: V,
-      ...args: Array<mixed>
-    ): Promise<HV>;
+    hsetifget<K: string, IFE: { [key: string]: * }, TSE: { [key: string]: * }>(
+      hashKey: K,
+      ifEquals: IFE,
+      thenSet: TSE,
+    ): Promise<{ ...IFE, ...TSE, [key: string]: * }>;
 
     // NOTE: These are complete, replacing the stubbed versions
     //       underneath them.
@@ -400,6 +398,10 @@ declare module 'ioredis' {
     scanStream(options?: ScanStreamOption): events$EventEmitter;
     hscanStream(key: string, options?: ScanStreamOption): events$EventEmitter;
     zscanStream(key: string, options?: ScanStreamOption): events$EventEmitter;
+
+    // this is required to allow for custom commands that are added
+    // using defineCommand
+    [customCommand: string]: (...args: Array<*>) => Promise<*>;
   }
 
   declare type Redis$IntegerResult = 1 | 0;
@@ -469,19 +471,31 @@ declare module 'ioredis' {
       callback: Redis$Callback<Redis$IntegerResult>,
     ): Redis$Pipeline<Redis$IntegerResult, A, B, C, D, E, F, G, H>,
 
-    hsetifeq<K: string, F, V>(
-      key: K,
-      field: F,
-      value: V,
-      ...args: Array<mixed>
+    hsetifeq<K: string, IFE: { [key: string]: * }, TSE: { [key: string]: * }>(
+      hashKey: K,
+      ifEquals: IFE,
+      thenSet: TSE,
     ): Redis$Pipeline<Redis$SimpleResult, A, B, C, D, E, F, G, H>,
 
-    hsetifget<K: string, F, V>(
-      key: K,
-      field: F,
-      value: V,
-      ...args: Array<mixed>
+    hsetifget<K: string, IFE: { [key: string]: * }, TSE: { [key: string]: * }>(
+      hashKey: K,
+      ifEquals: IFE,
+      thenSet: TSE,
     ): Redis$Pipeline<void | AnyObj, A, B, C, D, E, F, G, H>,
+
+    // hsetifeq<K: string, F, V>(
+    //   key: K,
+    //   field: F,
+    //   value: V,
+    //   ...args: Array<mixed>
+    // ): Redis$Pipeline<Redis$SimpleResult, A, B, C, D, E, F, G, H>,
+
+    // hsetifget<K: string, F, V>(
+    //   key: K,
+    //   field: F,
+    //   value: V,
+    //   ...args: Array<mixed>
+    // ):
 
     // stubs
     get(

@@ -9,22 +9,21 @@ import { lua } from 'ioredis-utils';
 const descriptors: Array<File$SimpleData> = [
   {
     descriptor: {
-      file: 'hsetifget.lua',
-      name: 'hsetifget',
-      ext: '.lua',
-    },
-    data: '-- name:  hsetifget\n-- keys:  key field value\n-- If field equals value, set then return new hash\nlocal value = unpack(redis.call("HMGET", KEYS[1], KEYS[2]))\nlocal check = KEYS[3]\nif value == check then\n  local result = redis.call("HMSET", KEYS[1], unpack(ARGV))\n  if result["ok"] then\n    return redis.call("HGETALL", KEYS[1])\n  end\nelse\n  return nil\nend\n',
-    params: (new Map([["name","hsetifget"],["keys",["key","field","value"]]]): Map<string, Array<string> | string>)
-  },
-
-  {
-    descriptor: {
       file: 'hsetifeq.lua',
       name: 'hsetifeq',
       ext: '.lua',
     },
-    data: '-- name:  hsetifeq\n-- keys:  key field value\n-- Set hash values only if field equals \nlocal value = unpack(redis.call("HMGET", KEYS[1], KEYS[2]))\nlocal check = KEYS[3]\nif value == check then\n  return redis.call("HMSET", KEYS[1], unpack(ARGV))\nelse\n  return nil\nend\n',
-    params: (new Map([["name","hsetifeq"],["keys",["key","field","value"]]]): Map<string, Array<string> | string>)
+    data: 'local HashKey = KEYS[1]\ntable.remove(KEYS, 1)\n\nif #KEYS % 2 ~= 0 or #ARGV %2 ~= 0 then\n  return redis.error_reply(\"Keys and args Must be a set of key/value pairs\")\nend\n\nlocal CheckKeys = {}\nlocal CheckTable = {}\n\nfor i=1,#KEYS/2 do\n  local k = KEYS[i * 2 - 1]\n  local v = KEYS[i * 2]\n  table.insert(CheckKeys, k)\n  CheckTable[k] = v\nend\n\nlocal HashArray = redis.call(\"HMGET\", HashKey, unpack(CheckKeys))\n\nfor i=1,#HashArray/2 do\n  local k = HashArray[i * 2 - 1]\n  local v = HashArray[i * 2]\n  if CheckTable[k] ~= v then\n    return nil\n  end\nend\n\nreturn redis.call(\"HMSET\", HashKey, unpack(ARGV))',
+    params: {"name":"hsetifeq","dynamic":false,"keys":[]},
+  },
+  {
+    descriptor: {
+      file: 'hsetifget.lua',
+      name: 'hsetifget',
+      ext: '.lua',
+    },
+    data: 'local HashKey = KEYS[1]\ntable.remove(KEYS, 1)\n\nif #KEYS % 2 ~= 0 or #ARGV %2 ~= 0 then\n  return redis.error_reply(\"Keys and args Must be a set of key/value pairs\")\nend\n\nlocal CheckKeys = {}\nlocal CheckTable = {}\n\nfor i=1,#KEYS/2 do\n  local k = KEYS[i * 2 - 1]\n  local v = KEYS[i * 2]\n  table.insert(CheckKeys, k)\n  CheckTable[k] = v\nend\n\nlocal HashArray = redis.call(\"HMGET\", HashKey, unpack(CheckKeys))\n\nfor i=1,#HashArray/2 do\n  local k = HashArray[i * 2 - 1]\n  local v = HashArray[i * 2]\n  if CheckTable[k] ~= v then\n    return nil\n  end\nend\n\n\nlocal result = redis.call(\"HMSET\", HashKey, unpack(ARGV))\n\nif result[\"ok\"] then\n  return redis.call(\"HGETALL\", HashKey)\nend\n\nreturn nil',
+    params: {"name":"hsetifget","dynamic":true,"keys":["key","ifMatchesThis","thenSetThese"]},
   },
 ];
 

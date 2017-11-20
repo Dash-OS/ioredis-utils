@@ -1,5 +1,6 @@
 // /* @flow */
 //
+import type { Redis$Commands } from 'ioredis';
 
 interface FS$Stats {
   dev: number;
@@ -53,6 +54,18 @@ export type FS$ReadDirPromised = ((path: string) => Promise<Array<string>>) &
     options: string | { encoding: string },
   ) => Promise<Array<string>>);
 
+export type Lua$Params = {
+  name: string,
+  keys: Array<string>,
+  dynamic: boolean,
+  [unknownParam: string]: mixed,
+};
+
+export type Lua$Transforms = {
+  args?: (args: Array<*>) => Array<mixed>,
+  result?: (result: Array<*>) => mixed,
+};
+
 export type File$Descriptor = {|
   file: string,
   name: string,
@@ -63,8 +76,9 @@ export type File$Descriptor = {|
 
 export type File$Data = {|
   +descriptor: File$Descriptor,
-  +data: string | Buffer,
-  params?: Map<string, Array<string> | string>,
+  data: string | Buffer,
+  params?: Lua$Params,
+  transforms?: Lua$Transforms,
 |};
 
 // reduced size descriptor for pre-compiled scripts
@@ -74,8 +88,9 @@ export type File$SimpleData = {|
     ext: string,
     file: string,
   },
-  +data: string | Buffer,
-  params?: Map<string, Array<string> | string>,
+  data: string | Buffer,
+  params?: Lua$Params,
+  transforms?: Lua$Transforms,
 |};
 
 export type FS$LStatPromised = (path: string) => Promise<FS$Stats>;
