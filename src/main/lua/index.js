@@ -81,6 +81,7 @@ function addScriptsToRedis(
     if (params) {
       const name = params.get('name');
       const keys = params.get('keys');
+      console.log(name);
       if (typeof name === 'string') {
         if (Array.isArray(keys)) {
           redis.defineCommand(name, {

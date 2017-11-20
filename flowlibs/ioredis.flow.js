@@ -94,7 +94,15 @@ declare module 'ioredis' {
       key: K,
       field: F,
       value: V,
+      ...args: Array<mixed>
     ): Promise<Redis$SimpleResult>;
+
+    hsetifget<K: string, F, V, HV>(
+      key: K,
+      field: F,
+      value: V,
+      ...args: Array<mixed>
+    ): Promise<HV>;
 
     // NOTE: These are complete, replacing the stubbed versions
     //       underneath them.
@@ -460,6 +468,20 @@ declare module 'ioredis' {
       time: T,
       callback: Redis$Callback<Redis$IntegerResult>,
     ): Redis$Pipeline<Redis$IntegerResult, A, B, C, D, E, F, G, H>,
+
+    hsetifeq<K: string, F, V>(
+      key: K,
+      field: F,
+      value: V,
+      ...args: Array<mixed>
+    ): Redis$Pipeline<Redis$SimpleResult, A, B, C, D, E, F, G, H>,
+
+    hsetifget<K: string, F, V>(
+      key: K,
+      field: F,
+      value: V,
+      ...args: Array<mixed>
+    ): Redis$Pipeline<void | AnyObj, A, B, C, D, E, F, G, H>,
 
     // stubs
     get(
