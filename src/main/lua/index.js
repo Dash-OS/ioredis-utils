@@ -1,5 +1,5 @@
 /* @flow */
-import type Redis, { Redis$Pipeline } from 'ioredis';
+import type Redis from 'ioredis';
 // import path from 'path';
 
 import type {

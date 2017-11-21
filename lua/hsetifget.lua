@@ -18,12 +18,30 @@
 --[[args => {
   const keys = [];
   let nkeys = 0;
-  if (args.length === 3) {
+  if (args.length === 3 || args.length === 4) {
     keys.push(args[0]);
     Object.keys(args[1]).reduce((p, key) => {
       p.push(key, args[1][key]);
       return p;
     }, keys);
+    if (args[3]) {
+      Object.keys(args[3]).reduce((p, key) => {
+        switch(key) {
+          case 'expires': {
+            p.push(`@EXAT`, args[3][key]);
+            break;
+          }
+          case 'ttl': {
+            p.push(`@EXIN`, args[3][key]);
+            break;
+          }
+          default: {
+            throw new Error(`Unknown hsetifget Parameter ${key}`);
+          }
+        }
+        return p
+      }, keys)
+    }
     nkeys = keys.length;
     Object.keys(args[2]).reduce((p, key) => {
       p.push(key, args[2][key]);
@@ -50,14 +68,30 @@ if #KEYS % 2 ~= 0 or #ARGV %2 ~= 0 then
   return redis.error_reply("Keys and args Must be a set of key/value pairs")
 end
 
+local PROPS = {
+  -- expire at
+  ['@EXAT'] = function(ms)
+    return redis.call('PEXPIREAT', HashKey, ms)
+  end,
+  -- expire in
+  ['@EXIN'] = function(ms)
+    return redis.call('PEXPIRE', HashKey, ms)
+  end
+}
+
 local CheckKeys = {}
+local RequestProps = {}
 local CheckTable = {}
 
 for i=1,#KEYS/2 do
   local k = KEYS[i * 2 - 1]
   local v = KEYS[i * 2]
-  table.insert(CheckKeys, k)
-  CheckTable[k] = v
+  if PROPS[k] then
+    RequestProps[k] = v
+  else
+    table.insert(CheckKeys, k)
+    CheckTable[k] = v
+  end
 end
 
 local HashArray = redis.call("HMGET", HashKey, unpack(CheckKeys))
@@ -75,6 +109,9 @@ end
 local result = redis.call("HMSET", HashKey, unpack(ARGV))
 
 if result["ok"] then
+  for k,v in pairs(RequestProps) do
+    PROPS[v](v)
+  end
   return redis.call("HGETALL", HashKey)
 end
 
