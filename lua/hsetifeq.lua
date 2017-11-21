@@ -1,3 +1,11 @@
+--[[
+  Summary:
+    Checks if the current hashs fields match the keys, sets the args
+    on the hash if they do.
+
+  Returns:
+    +OK or null
+]]
 -- name:    hsetifeq
 -- dynamic: true
 -- keys:    key field value
@@ -27,14 +35,7 @@
   }
   return response;
 }]]
---[[
-  Summary:
-    Checks if the current hashs fields match the keys, sets the args
-    on the hash if they do.
 
-  Returns:
-    +OK or null
-]]
 local HashKey = KEYS[1]
 table.remove(KEYS, 1)
 

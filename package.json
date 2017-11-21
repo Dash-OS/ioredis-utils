@@ -1,6 +1,6 @@
 {
   "name": "ioredis-utils",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "A handful of utilities for ioredis",
   "main": "lib/index.js",
   "author": "Braden R. Napier",
@@ -40,7 +40,7 @@
     "flow-bin": "^0.59.0",
     "flow-copy-source": "^1.2.1",
     "ioredis": "^3.2.1",
-    "ioredis-utils": "^1.3.0",
+    "ioredis-utils": "^1.3.1",
     "npm-run-all": "^4.1.2",
     "rimraf": "^2.6.2",
     "task-handler": "^1.0.13"

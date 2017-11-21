@@ -1,3 +1,17 @@
+--[[
+  Summary:
+    Checks if the hash with key KEYS[1] matches the KEYS.  If it does,
+    then it sets the values on the hash given in ARGV.
+
+    So "hash1", { field1: 'value1', field2: 'value2' }, { field3: 'value3' }
+    if hash with key "hash1"
+     has field "field1" with value "value1" AND
+     has field "field2" with value "value2"
+    THEN
+      set "hash1" "field3" "value3"
+
+  Returns the modified hash
+]]
 --| name:    hsetifget
 --| dynamic: true
 --| keys:    key ifMatchesThis thenSetThese
@@ -27,20 +41,6 @@
   }
   return response;
 }]]
---[[
-  Summary:
-    Checks if the hash with key KEYS[1] matches the KEYS.  If it does,
-    then it sets the values on the hash given in ARGV.
-
-    So "hash1", { field1: 'value1', field2: 'value2' }, { field3: 'value3' }
-    if hash with key "hash1"
-     has field "field1" with value "value1" AND
-     has field "field2" with value "value2"
-    THEN
-      set "hash1" "field3" "value3"
-
-  Returns the modified hash
-]]
 
 -- local KEYS = {"hash1", "field1", "value1", "field2", "value2", "field3", "value3"}
 local HashKey = KEYS[1]
