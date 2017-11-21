@@ -3,6 +3,9 @@
     Checks if the hash with key KEYS[1] matches the KEYS.  If it does,
     then it sets the values on the hash given in ARGV.
 
+    Additionally allows a 3rd argument for options, namely
+    { ttl?: number, expires?: number }
+
     So "hash1", { field1: 'value1', field2: 'value2' }, { field3: 'value3' }
     if hash with key "hash1"
      has field "field1" with value "value1" AND

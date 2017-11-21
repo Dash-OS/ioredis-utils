@@ -1795,9 +1795,9 @@ invert-kv@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/invert-kv/-/invert-kv-1.0.0.tgz#104a8e4aaca6d3d8cd157a8ef8bfab2d7a3ffdb6"
 
-ioredis-utils@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/ioredis-utils/-/ioredis-utils-1.4.0.tgz#ca70c39e86009673bd91bd095e573f63e66b5b91"
+ioredis-utils@^1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/ioredis-utils/-/ioredis-utils-1.4.2.tgz#ddb16d3f766120269771b6e188aa9c87ca7fb7ac"
 
 ioredis@^3.2.1:
   version "3.2.1"

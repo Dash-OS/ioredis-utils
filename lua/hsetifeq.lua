@@ -3,6 +3,9 @@
     Checks if the current hashs fields match the keys, sets the args
     on the hash if they do.
 
+    Additionally allows a 3rd argument for options, namely
+    { ttl?: number, expires?: number }
+
   Returns:
     +OK or null
 ]]
