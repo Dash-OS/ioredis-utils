@@ -86,13 +86,15 @@ for i=1,#KEYS/2 do
   end
 end
 
-local HashArray = redis.call("HMGET", HashKey, unpack(CheckKeys))
+if #CheckKeys > 0 then
+  local HashArray = redis.call("HMGET", HashKey, unpack(CheckKeys))
 
-for i=1,#HashArray/2 do
-  local k = HashArray[i * 2 - 1]
-  local v = HashArray[i * 2]
-  if CheckTable[k] ~= v then
-    return nil
+  for i=1,#HashArray/2 do
+    local k = HashArray[i * 2 - 1]
+    local v = HashArray[i * 2]
+    if CheckTable[k] ~= v then
+      return nil
+    end
   end
 end
 
