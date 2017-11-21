@@ -6,53 +6,40 @@ import { log } from '../utils/log';
 const redis = new Redis();
 
 addDefaultScriptsToRedis(redis);
-log('Default Scripts Added!');
-
-console.log(redis.hsetifget);
 
 function startExampleOne() {
   const START = log('\n-- START EXAMPLE ONE (STANDARD) --\n');
-  redis
-    .multi()
-    .del('hash1')
-    .hmset('hash1', { field1: 'value1', isTrue: 1 })
+  return redis
     .hmget('hash1', 'field1', 'isTrue')
-    .exec()
-    .then(results => {
-      const value = results[2][1];
-      if (value[0] === 'value1' && value[1] === '1') {
-        return redis
-          .multi()
-          .hmset('hash1', { field2: 'value2', field3: 'value3' })
-          .hgetall('hash1')
-          .exec();
+    .then(result => {
+      if (Array.isArray(result)) {
+        if (result[0] === 'value1' && result[1] === '1') {
+          return redis
+            .multi()
+            .hmset('hash1', { field2: 'value2', field3: 'value3' })
+            .hgetall('hash1')
+            .exec();
+        }
       }
       return null;
     })
     .then(results => {
-      const result = results[1][1];
-      const END = log('\n\n-- END EXAMPLE ONE --\n', result);
-      log('Example One Duration: ', END - START);
-
-      return startExampleTwo();
+      if (results) {
+        const result = results[1][1];
+        const END = log('\n\n-- END EXAMPLE ONE --\n', result);
+        log('Example One Duration: ', END - START);
+      }
     });
 }
 
 function startExampleTwo() {
   const START = log('\n-- START EXAMPLE TWO (LUA-DRIVEN) --\n');
-
-  // console.log(cmd);
   return redis
-    .multi()
-    .del('hash1')
-    .hmset('hash1', { field1: 'value1', isTrue: 1 })
-    .exec()
-    .then(() =>
-      redis.hsetifget(
-        'hash1',
-        { field1: 'value1', isTrue: 1 },
-        { field2: 'value2', field3: 'value3' },
-      ))
+    .hsetifget(
+      'hash1',
+      { field1: 'value1', isTrue: 1 },
+      { field2: 'value2', field3: 'value3' },
+    )
     .then(result => {
       // const result = results[2][1];
       const END = log('\n\n-- END EXAMPLE TWO --\n', result);
@@ -63,14 +50,43 @@ function startExampleTwo() {
 Promise.resolve().then(() => {
   redis.monitor((err, monitor) => {
     // log('Redis Monitor Started');
+    // eslint-disable-next-line
     monitor.on('monitor', (time: number, args: Array<mixed>) => {
+      // see each command execution by uncommenting this
       // log('[MONITOR] | ', time, args);
     });
-    startExampleOne();
+    redis
+      .del('hash1')
+      .then(() => redis.hmset('hash1', { field1: 'value1', isTrue: 1 }))
+      .then(() => startExampleOne())
+      .then(() => redis.del('hash1'))
+      .then(() => redis.hmset('hash1', { field1: 'value1', isTrue: 1 }))
+      .then(() => startExampleTwo());
   });
 });
 
 /*
-  +2.6588    958958752.830661     Default Scripts Added!
-  [Function]
+  +17.0790   1058489502.422319
+  -- START EXAMPLE ONE (STANDARD) --
+
+  +3.3570    1058489505.779367
+  -- END EXAMPLE ONE --
+  { field1: 'value1',
+  isTrue: '1',
+  field2: 'value2',
+  field3: 'value3' }
+  +1.2867    1058489507.0661      Example One Duration:  3.357047915458679
+
+  +0.5961    1058489507.662159
+  -- START EXAMPLE TWO (LUA-DRIVEN) --
+
+  +0.8865    1058489508.548647
+
+  -- END EXAMPLE TWO --
+  { field1: 'value1',
+  isTrue: '1',
+  field2: 'value2',
+  field3: 'value3' }
+  +0.0962    1058489508.644885    Example Two Duration:  0.8864880800247192
+
 */

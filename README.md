@@ -14,15 +14,19 @@ yarn add ioredis-utils
 npm install --save ioredis-utils
 ```
 
-## 100% Flow Coverage
+## Flow Coverage
 
-Proudly built with 100% Flow Coverage and exported .flow.js files so your flow
-projects will benefit!
+Proudly built with 95-100% Flow Coverage and exported .flow.js files so your
+flow projects will benefit!
 
 We strongly recommend you look over the
 [types](https://github.com/Dash-OS/ioredis-utils/tree/master/src/types/index.js)
 in the source. This will give you an idea of how the various pieces of the
 package work.
+
+> **Note:** There are some places that 100% Flow Coverage is not currently
+> possible. Places such as try/catch blocks and `this` binding may not have
+> coverage.
 
 ## Temporary Overview
 

@@ -104,6 +104,10 @@ declare module 'ioredis' {
 
     // NOTE: These are complete, replacing the stubbed versions
     //       underneath them.
+    hmget<K: string>(
+      hashKey: K,
+      ...args: Array<*>
+    ): Promise<null | Array<string>>;
     hgetall<V>(key: string): Promise<V>;
     hgetall<V>(key: string, callback: Redis$Callback<V>): any;
     hmset<K, V: Object>(key: K, hash: V): Promise<Redis$SimpleResult>;
@@ -250,8 +254,7 @@ declare module 'ioredis' {
     // hmset(args: any[], callback: ResCallbackT<any>): void;
     // hmset(key: string, hash: any, callback: ResCallbackT<any>): void;
     // hmset(...args: any[]): Promise<any>;
-    hmget(args: any[], callback: ResCallbackT<any>): void;
-    hmget(...args: any[]): Promise<any>;
+
     hincrby(args: any[], callback: ResCallbackT<any>): void;
     hincrby(...args: any[]): Promise<any>;
     hincrbyfloat(args: any[], callback: ResCallbackT<any>): void;
@@ -403,7 +406,7 @@ declare module 'ioredis' {
     // using defineCommand
     [customCommand: string]: (
       ...args: Array<*>
-    ) => Promise<*> | Redis$Pipeline<*, *, *, *, *, *, *, *, *>;
+    ) => Promise<*> | Redis$Pipeline<>;
   }
 
   declare type Redis$IntegerResult = 1 | 0;
@@ -486,6 +489,12 @@ declare module 'ioredis' {
       ifEquals: IFE,
       thenSet: TSE,
     ): Redis$Pipeline<void | AnyObj, A, B, C, D, E, F, G, H>,
+
+    hmget<K: string>(
+      hashKey: K,
+      ...args: Array<string>
+    ): Redis$Pipeline<null | Array<string>, A, B, C, D, E, F, G, H>,
+    // hmget(...args: any[]): Redis$Pipeline<A, B, C, D, E, F, G, H, I>,
 
     // hsetifeq<K: string, F, V>(
     //   key: K,
@@ -1152,11 +1161,6 @@ declare module 'ioredis' {
       args: any[],
       callback?: ResCallbackT<any>,
     ): Redis$Pipeline<A, B, C, D, E, F, G, H, I>,
-    hmget(
-      args: any[],
-      callback?: ResCallbackT<any>,
-    ): Redis$Pipeline<A, B, C, D, E, F, G, H, I>,
-    hmget(...args: any[]): Redis$Pipeline<A, B, C, D, E, F, G, H, I>,
   };
 
   // declare export interface Redis$Pipeline<

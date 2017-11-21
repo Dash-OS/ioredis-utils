@@ -181,14 +181,13 @@ function addTransforms(redis: Redis, script) {
     if (typeof name === 'string' && redis[name]) {
       const originalCommand = redis[name];
       redis[name] = function wrapCustomCommand(..._args) {
-        const self: Redis = this;
         let args;
         if (typeof argsTransformer === 'function') {
           args = argsTransformer(_args);
         } else {
           args = _args;
         }
-        const result = originalCommand.apply(self, args);
+        const result = originalCommand.apply(this, args);
         if (typeof resultTransformer === 'function') {
           if (typeof result.then === 'function') {
             return result.then(resultTransformer);
@@ -199,11 +198,10 @@ function addTransforms(redis: Redis, script) {
             // we are likely in a pipeline, this requires us to do some
             // odd logic to embed ourselves into the fn's result
             const idx = result._queue.length - 2;
-            // we need to wrap exec
+            // we need to wrap exec so we can transform the results
             const originalExec = result.exec;
-            result.exec = function executeWrappedPipeline() {
-              const pipeline: Redis$Pipeline<*, *, *, *, *, *, *, *, *> = this;
-              return originalExec.call(pipeline).then(results => {
+            result.exec = function executeWrappedPipeline(): Promise<*> {
+              return originalExec.call(this).then(results => {
                 // $FlowIgnore
                 results[idx][1] = resultTransformer(results[idx][1]);
                 return results;
