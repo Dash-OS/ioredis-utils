@@ -88,7 +88,6 @@ end
 
 if #CheckKeys > 0 then
   local HashArray = redis.call("HMGET", HashKey, unpack(CheckKeys))
-
   for i=1,#HashArray/2 do
     local k = HashArray[i * 2 - 1]
     local v = HashArray[i * 2]
@@ -99,7 +98,7 @@ if #CheckKeys > 0 then
 end
 
 for k,v in pairs(RequestProps) do
-  PROPS[v](v)
+  PROPS[k](v)
 end
 
 return redis.call("HMSET", HashKey, unpack(ARGV))

@@ -39,6 +39,9 @@ function startExampleTwo() {
       'hash1',
       { field1: 'value1', isTrue: 1 },
       { field2: 'value2', field3: 'value3' },
+      {
+        ttl: 95000,
+      },
     )
     .then(result => {
       // const result = results[2][1];

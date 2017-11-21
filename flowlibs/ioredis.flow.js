@@ -31,6 +31,11 @@ declare module 'ioredis' {
     sendCommand(): void;
   }
 
+  declare type CustomOpts = {|
+    ttl?: number,
+    expires?: number,
+  |};
+
   declare class Redis extends Commander {
     constructor(port?: number, host?: string, options?: RedisOptions): void;
     constructor(host?: string, options?: RedisOptions): void;
@@ -94,12 +99,14 @@ declare module 'ioredis' {
       hashKey: K,
       ifEquals: IFE,
       thenSet: TSE,
+      opts?: CustomOpts,
     ): Promise<Redis$SimpleResult>;
 
     hsetifget<K: string, IFE: { [key: string]: * }, TSE: { [key: string]: * }>(
       hashKey: K,
       ifEquals: IFE,
       thenSet: TSE,
+      opts?: CustomOpts,
     ): Promise<{ ...IFE, ...TSE, [key: string]: * }>;
 
     // NOTE: These are complete, replacing the stubbed versions
@@ -482,12 +489,14 @@ declare module 'ioredis' {
       hashKey: K,
       ifEquals: IFE,
       thenSet: TSE,
+      opts?: CustomOpts,
     ): Redis$Pipeline<Redis$SimpleResult, A, B, C, D, E, F, G, H>,
 
     hsetifget<K: string, IFE: { [key: string]: * }, TSE: { [key: string]: * }>(
       hashKey: K,
       ifEquals: IFE,
       thenSet: TSE,
+      opts?: CustomOpts,
     ): Redis$Pipeline<void | AnyObj, A, B, C, D, E, F, G, H>,
 
     hmget<K: string>(

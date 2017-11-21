@@ -1,6 +1,6 @@
 {
   "name": "ioredis-utils",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "A handful of utilities for ioredis",
   "main": "lib/index.js",
   "author": "Braden R. Napier",
