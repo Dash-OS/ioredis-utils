@@ -9,6 +9,57 @@ import { lua } from 'ioredis-utils';
 const descriptors: Array<File$SimpleData> = [
   {
     descriptor: {
+      file: 'getkeysinset.lua',
+      name: 'getkeysinset',
+      ext: '.lua',
+    },
+    data: 'local SetKey = KEYS[1]\nlocal Type = KEYS[2]\n\nif not Type then\n  Type = \'hash\'\nend\n\nlocal ResponseTable = { Type }\nlocal SetMembers = redis.call(\"SMEMBERS\", SetKey)\n\nif #SetMembers == 0 then return ResponseTable end\n\nlocal Get = {\n  string = function(key)\n    return redis.call(\"GET\", key)\n  end,\n  hash = function(key)\n    return redis.call(\"HGETALL\", key)\n  end,\n  set = function(key)\n    return redis.call(\"SMEMBERS\", key)\n  end\n}\n\nfor _,v in pairs(SetMembers) do\n  table.insert(ResponseTable, v)\n  table.insert(ResponseTable, Get[Type](v))\nend\n\nreturn ResponseTable',
+    params: {"name":"getkeysinset","dynamic":true,"keys":["key","type"]},
+    transforms: {
+        args: args => {
+  if (args.length === 1) {
+    return [1, ...args]
+  } else if (args.length === 2) {
+    return [2, ...args]
+  } else {
+    throw new Error(`[REDIS] | Invalid # of Keys: ${args.length}`)
+  }
+},
+        result: result => {
+  if (!Array.isArray(result)) return result;
+  const type = result.shift();
+  const response = new Map()
+  for (let i = 0; i < result.length / 2; i += 1) {
+    const idx = i * 2
+    const key = result[idx]
+    const val = result[idx + 1]
+    switch(type) {
+      case 'hash': {
+        const hash = {}
+        for (let i2 = 0; i2 < val.length / 2; i2 += 1) {
+          const idx2 = i2 * 2
+          hash[ val[idx2] ] = val[idx2 + 1]
+        }
+        response.set(key, hash);
+        break
+      }
+      case 'string': {
+        response.set(key, val)
+        break;
+      }
+      case 'set': {
+        response.set(key, new Set(val))
+        break;
+      }
+    }
+  }
+  return response;
+},
+    },
+    
+  },
+  {
+    descriptor: {
       file: 'hsetifeq.lua',
       name: 'hsetifeq',
       ext: '.lua',
