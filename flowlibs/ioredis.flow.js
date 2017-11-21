@@ -401,7 +401,9 @@ declare module 'ioredis' {
 
     // this is required to allow for custom commands that are added
     // using defineCommand
-    [customCommand: string]: (...args: Array<*>) => Promise<*>;
+    [customCommand: string]: (
+      ...args: Array<*>
+    ) => Promise<*> | Redis$Pipeline<*, *, *, *, *, *, *, *, *>;
   }
 
   declare type Redis$IntegerResult = 1 | 0;
@@ -439,6 +441,8 @@ declare module 'ioredis' {
     I = void,
   > = {
     length: number,
+
+    +_queue: Array<*>,
 
     exec: () => Promise<
       Redis$ArrayOfResults<A | B | C | D | E | F | G | H | I>,

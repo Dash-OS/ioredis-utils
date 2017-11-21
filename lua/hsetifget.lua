@@ -1,7 +1,7 @@
 --| name:    hsetifget
 --| dynamic: true
 --| keys:    key ifMatchesThis thenSetThese
---[[(args: { [key: string]: * }) => {
+--[[args => {
   const keys = [];
   let nkeys = 0;
   if (args.length === 3) {
@@ -18,11 +18,12 @@
   }
   return [nkeys, ...keys];
 }]]
---[[(result: Array<*>): { [key: string]: * } => {
+--[[result => {
   if (!Array.isArray(result)) return result;
   const response = {}
   for (let i = 0; i < result.length / 2; i += 1) {
-    response[ result[i * 2] ] = result[i * 2 + 1];
+    const idx = i * 2
+    response[ result[idx] ] = result[idx + 1];
   }
   return response;
 }]]
@@ -61,9 +62,9 @@ end
 
 local HashArray = redis.call("HMGET", HashKey, unpack(CheckKeys))
 
-for i=1,#HashArray/2 do
-  local k = HashArray[i * 2 - 1]
-  local v = HashArray[i * 2]
+for i=1,#HashArray do
+  local k = CheckKeys[i]
+  local v = HashArray[i]
   if CheckTable[k] ~= v then
     return nil
   end

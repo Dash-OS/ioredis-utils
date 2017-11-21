@@ -1,7 +1,7 @@
 -- name:    hsetifeq
 -- dynamic: true
 -- keys:    key field value
---[[(args: { [key: string]: * }) => {
+--[[args => {
   const keys = [];
   let nkeys = 0;
   if (args.length === 3) {
@@ -18,11 +18,12 @@
   }
   return [nkeys, ...keys];
 }]]
---[[(result: Array<*>): { [key: string]: * } => {
+--[[result => {
   if (!Array.isArray(result)) return result;
   const response = {}
   for (let i = 0; i < result.length / 2; i += 1) {
-    response[ result[i * 2] ] = result[i * 2 + 1];
+    const idx = i * 2
+    response[ result[idx] ] = result[idx + 1];
   }
   return response;
 }]]

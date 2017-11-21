@@ -71,17 +71,21 @@ need to add them to the arguments each time you call the command.
 
 > If name is not provided it will use the name of the file instead.
 
-Below is an example of a `hsetifeq.lua` script (excuse the poor lua skills -
-feel free to improve upon it via pull request :)).
+Below is an example of a `hsetifeq.lua` script:
 
 > **Note:** All comments are stripped (including multiline) during the
 > processing of the script.
+
+> **Note:** Fairly new to lua, apparently the below was the most efficient way
+> to do things. It seems to lack support for many things we take for granted in
+> other languages. Feel free to pull request more efficient versions of the
+> script if you have one!
 
 ```lua
 -- name:    hsetifeq
 -- dynamic: true
 -- keys:    key field value
---[[(args: { [key: string]: * }) => {
+--[[args => {
   const keys = [];
   let nkeys = 0;
   if (args.length === 3) {
@@ -98,11 +102,12 @@ feel free to improve upon it via pull request :)).
   }
   return [nkeys, ...keys];
 }]]
---[[(result: Array<*>): { [key: string]: * } => {
+--[[result => {
   if (!Array.isArray(result)) return result;
   const response = {}
   for (let i = 0; i < result.length / 2; i += 1) {
-    response[ result[i * 2] ] = result[i * 2 + 1];
+    const idx = i * 2
+    response[ result[idx] ] = result[idx + 1];
   }
   return response;
 }]]
@@ -148,8 +153,11 @@ return redis.call("HMSET", HashKey, unpack(ARGV))
 
 There are some included and
 [pre-compiled lua scripts](https://github.com/Dash-OS/ioredis-utils/blob/master/src/extras/scripts.js)
-with this library. They are not used by default and are not imported. They are
-automatically built whenever the package is published from the
+with this library. They increase the performance of doing the same with
+multi/pipelines by well over 300%.
+
+They are not used by default and are not imported. They are automatically built
+whenever the package is published from the
 [lua directory](https://github.com/Dash-OS/ioredis-utils/tree/master/lua). You
 can easily add them if you wish:
 

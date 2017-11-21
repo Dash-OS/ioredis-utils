@@ -3,8 +3,8 @@
 // These are pre-compiled lua script descriptors which can be loaded
 // into
 import type Redis from 'ioredis';
-import type { File$SimpleData } from 'ioredis-utils/lib/types';
-import { lua } from 'ioredis-utils';
+import type { File$SimpleData } from '../main/types';
+import { lua } from '../main';
 
 const descriptors: Array<File$SimpleData> = [
   {
@@ -13,8 +13,37 @@ const descriptors: Array<File$SimpleData> = [
       name: 'hsetifeq',
       ext: '.lua',
     },
-    data: 'local HashKey = KEYS[1]\ntable.remove(KEYS, 1)\n\nif #KEYS % 2 ~= 0 or #ARGV %2 ~= 0 then\n  return redis.error_reply(\"Keys and args Must be a set of key/value pairs\")\nend\n\nlocal CheckKeys = {}\nlocal CheckTable = {}\n\nfor i=1,#KEYS/2 do\n  local k = KEYS[i * 2 - 1]\n  local v = KEYS[i * 2]\n  table.insert(CheckKeys, k)\n  CheckTable[k] = v\nend\n\nlocal HashArray = redis.call(\"HMGET\", HashKey, unpack(CheckKeys))\n\nfor i=1,#HashArray/2 do\n  local k = HashArray[i * 2 - 1]\n  local v = HashArray[i * 2]\n  if CheckTable[k] ~= v then\n    return nil\n  end\nend\n\nreturn redis.call(\"HMSET\", HashKey, unpack(ARGV))',
-    params: {"name":"hsetifeq","dynamic":false,"keys":[]},
+    data:
+      'local HashKey = KEYS[1]\ntable.remove(KEYS, 1)\n\nif #KEYS % 2 ~= 0 or #ARGV %2 ~= 0 then\n  return redis.error_reply("Keys and args Must be a set of key/value pairs")\nend\n\nlocal CheckKeys = {}\nlocal CheckTable = {}\n\nfor i=1,#KEYS/2 do\n  local k = KEYS[i * 2 - 1]\n  local v = KEYS[i * 2]\n  table.insert(CheckKeys, k)\n  CheckTable[k] = v\nend\n\nlocal HashArray = redis.call("HMGET", HashKey, unpack(CheckKeys))\n\nfor i=1,#HashArray/2 do\n  local k = HashArray[i * 2 - 1]\n  local v = HashArray[i * 2]\n  if CheckTable[k] ~= v then\n    return nil\n  end\nend\n\nreturn redis.call("HMSET", HashKey, unpack(ARGV))',
+    params: { name: 'hsetifeq', dynamic: false, keys: [] },
+    transforms: {
+      args: args => {
+        const keys = [];
+        let nkeys = 0;
+        if (args.length === 3) {
+          keys.push(args[0]);
+          Object.keys(args[1]).reduce((p, key) => {
+            p.push(key, args[1][key]);
+            return p;
+          }, keys);
+          nkeys = keys.length;
+          Object.keys(args[2]).reduce((p, key) => {
+            p.push(key, args[2][key]);
+            return p;
+          }, keys);
+        }
+        return [nkeys, ...keys];
+      },
+      result: result => {
+        if (!Array.isArray(result)) return result;
+        const response = {};
+        for (let i = 0; i < result.length / 2; i += 1) {
+          const idx = i * 2;
+          response[result[idx]] = result[idx + 1];
+        }
+        return response;
+      },
+    },
   },
   {
     descriptor: {
@@ -22,8 +51,41 @@ const descriptors: Array<File$SimpleData> = [
       name: 'hsetifget',
       ext: '.lua',
     },
-    data: 'local HashKey = KEYS[1]\ntable.remove(KEYS, 1)\n\nif #KEYS % 2 ~= 0 or #ARGV %2 ~= 0 then\n  return redis.error_reply(\"Keys and args Must be a set of key/value pairs\")\nend\n\nlocal CheckKeys = {}\nlocal CheckTable = {}\n\nfor i=1,#KEYS/2 do\n  local k = KEYS[i * 2 - 1]\n  local v = KEYS[i * 2]\n  table.insert(CheckKeys, k)\n  CheckTable[k] = v\nend\n\nlocal HashArray = redis.call(\"HMGET\", HashKey, unpack(CheckKeys))\n\nfor i=1,#HashArray/2 do\n  local k = HashArray[i * 2 - 1]\n  local v = HashArray[i * 2]\n  if CheckTable[k] ~= v then\n    return nil\n  end\nend\n\n\nlocal result = redis.call(\"HMSET\", HashKey, unpack(ARGV))\n\nif result[\"ok\"] then\n  return redis.call(\"HGETALL\", HashKey)\nend\n\nreturn nil',
-    params: {"name":"hsetifget","dynamic":true,"keys":["key","ifMatchesThis","thenSetThese"]},
+    data:
+      'local HashKey = KEYS[1]\ntable.remove(KEYS, 1)\n\nif #KEYS % 2 ~= 0 or #ARGV %2 ~= 0 then\n  return redis.error_reply("Keys and args Must be a set of key/value pairs")\nend\n\nlocal CheckKeys = {}\nlocal CheckTable = {}\n\nfor i=1,#KEYS/2 do\n  local k = KEYS[i * 2 - 1]\n  local v = KEYS[i * 2]\n  table.insert(CheckKeys, k)\n  CheckTable[k] = v\nend\n\nlocal HashArray = redis.call("HMGET", HashKey, unpack(CheckKeys))\n\nfor i=1,#HashArray do\n  local k = CheckKeys[i]\n  local v = HashArray[i]\n  if CheckTable[k] ~= v then\n    return nil\n  end\nend\n\n\nlocal result = redis.call("HMSET", HashKey, unpack(ARGV))\n\nif result["ok"] then\n  return redis.call("HGETALL", HashKey)\nend\n\nreturn nil',
+    params: {
+      name: 'hsetifget',
+      dynamic: true,
+      keys: ['key', 'ifMatchesThis', 'thenSetThese'],
+    },
+    transforms: {
+      args: args => {
+        const keys = [];
+        let nkeys = 0;
+        if (args.length === 3) {
+          keys.push(args[0]);
+          Object.keys(args[1]).reduce((p, key) => {
+            p.push(key, args[1][key]);
+            return p;
+          }, keys);
+          nkeys = keys.length;
+          Object.keys(args[2]).reduce((p, key) => {
+            p.push(key, args[2][key]);
+            return p;
+          }, keys);
+        }
+        return [nkeys, ...keys];
+      },
+      result: result => {
+        if (!Array.isArray(result)) return result;
+        const response = {};
+        for (let i = 0; i < result.length / 2; i += 1) {
+          const idx = i * 2;
+          response[result[idx]] = result[idx + 1];
+        }
+        return response;
+      },
+    },
   },
 ];
 

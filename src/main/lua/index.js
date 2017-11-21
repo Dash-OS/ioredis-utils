@@ -1,5 +1,5 @@
 /* @flow */
-import type Redis from 'ioredis';
+import type Redis, { Redis$Pipeline } from 'ioredis';
 // import path from 'path';
 
 import type {
@@ -180,17 +180,38 @@ function addTransforms(redis: Redis, script) {
     const { name } = params;
     if (typeof name === 'string' && redis[name]) {
       const originalCommand = redis[name];
-      redis[name] = (..._args) => {
+      redis[name] = function wrapCustomCommand(..._args) {
+        const self: Redis = this;
         let args;
         if (typeof argsTransformer === 'function') {
           args = argsTransformer(_args);
         } else {
           args = _args;
         }
+        const result = originalCommand.apply(self, args);
         if (typeof resultTransformer === 'function') {
-          return originalCommand.apply(redis, args).then(resultTransformer);
+          if (typeof result.then === 'function') {
+            return result.then(resultTransformer);
+          } else if (
+            !(result instanceof Promise) &&
+            Array.isArray(result._queue)
+          ) {
+            // we are likely in a pipeline, this requires us to do some
+            // odd logic to embed ourselves into the fn's result
+            const idx = result._queue.length - 2;
+            // we need to wrap exec
+            const originalExec = result.exec;
+            result.exec = function executeWrappedPipeline() {
+              const pipeline: Redis$Pipeline<*, *, *, *, *, *, *, *, *> = this;
+              return originalExec.call(pipeline).then(results => {
+                // $FlowIgnore
+                results[idx][1] = resultTransformer(results[idx][1]);
+                return results;
+              });
+            };
+          }
         }
-        return originalCommand.apply(redis, args);
+        return result;
       };
     }
   }
