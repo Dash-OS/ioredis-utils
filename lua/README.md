@@ -12,8 +12,18 @@ The custom commands are added to our custom `flowlib` which you can add to your
 ./node_modules/ioredis-utils/flowlibs
 ```
 
-## getkeysinset
+## KeySet Type
 
-## hsetifeq
+### msetkeyset
 
-## hsetifget
+### setkeyset
+
+### delkeyset
+
+### getkeyset
+
+## Hash Utilities
+
+### hsetifeq
+
+### hsetifget
