@@ -36,6 +36,12 @@ declare module 'ioredis' {
     expires?: number,
   |};
 
+  declare type GetKeysTypes = {
+    string: string,
+    set: Set<*>,
+    hash: { [key: string]: string },
+  };
+
   declare class Redis extends Commander {
     constructor(port?: number, host?: string, options?: RedisOptions): void;
     constructor(host?: string, options?: RedisOptions): void;
@@ -108,6 +114,25 @@ declare module 'ioredis' {
       thenSet: TSE,
       opts?: CustomOpts,
     ): Promise<{ ...IFE, ...TSE, [key: string]: * }>;
+
+    getkeysinset<K: string>(
+      setKey: K,
+    ): Promise<Map<string, { [key: string]: string }>>;
+
+    getkeysinset<K: string>(
+      setKey: K,
+      type: 'hash',
+    ): Promise<Map<string, { [key: string]: string }>>;
+
+    getkeysinset<K: string>(
+      setKey: K,
+      type: 'string',
+    ): Promise<Map<string, string>>;
+
+    getkeysinset<K: string>(
+      setKey: K,
+      type: 'set',
+    ): Promise<Map<string, Set<string>>>;
 
     // NOTE: These are complete, replacing the stubbed versions
     //       underneath them.
@@ -503,6 +528,11 @@ declare module 'ioredis' {
       hashKey: K,
       ...args: Array<string>
     ): Redis$Pipeline<null | Array<string>, A, B, C, D, E, F, G, H>,
+
+    getkeysinset<K: string, T: 'hash' | 'string' | 'set'>(
+      setKey: K,
+      type?: T,
+    ): Redis$Pipeline<Map<string, *>, A, B, C, D, E, F, G, H>,
     // hmget(...args: any[]): Redis$Pipeline<A, B, C, D, E, F, G, H, I>,
 
     // hsetifeq<K: string, F, V>(

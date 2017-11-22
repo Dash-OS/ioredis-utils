@@ -11,6 +11,9 @@ function startExample() {
   const START = log('\n-- START EXAMPLE --\n');
   return redis.getkeysinset('example:set').then(result => {
     const END = log('Result Ready!', result);
+    for (const [key, value] of result) {
+      console.log('Result: ', key, value);
+    }
     log('Time for Execution: ', END - START);
   });
 }
@@ -52,27 +55,15 @@ Promise.resolve().then(() => {
 });
 
 /*
-  +17.0790   1058489502.422319
-  -- START EXAMPLE ONE (STANDARD) --
+  +47.4010   1130412644.118626    Redis Example Prepared - Executing Example:
+  +0.5110    1130412644.629585
+  -- START EXAMPLE --
 
-  +3.3570    1058489505.779367
-  -- END EXAMPLE ONE --
-  { field1: 'value1',
-  isTrue: '1',
-  field2: 'value2',
-  field3: 'value3' }
-  +1.2867    1058489507.0661      Example One Duration:  3.357047915458679
-
-  +0.5961    1058489507.662159
-  -- START EXAMPLE TWO (LUA-DRIVEN) --
-
-  +0.8865    1058489508.548647
-
-  -- END EXAMPLE TWO --
-  { field1: 'value1',
-  isTrue: '1',
-  field2: 'value2',
-  field3: 'value3' }
-  +0.0962    1058489508.644885    Example Two Duration:  0.8864880800247192
+  +1.1131    1130412645.74265     Result Ready!
+  Result:  example:set:one   { example: 'one' }
+  Result:  example:set:three { example: 'three' }
+  Result:  example:set:two   { example: 'two' }
+  +1.2093    1130412646.951928    Time for Execution:  1.1130650043487549
+  +0.1048    1130412647.056682    Example Complete
 
 */
