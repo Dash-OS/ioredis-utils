@@ -5,14 +5,8 @@
     given KeySet.
 
   'mykeyset',
-  new Map([
-    ['keyone', { one: 'two' }],
-    ['keytwo', { one: 'two' }]
-  ])
-  -->
-  'mykeyset': KeySet<'keyone', 'keytwo'>
-  'keyone': { one: 'two' }
-  'keytwo': { one: 'two' }
+  'mykey',
+  { some: 'value' }
 
 ]]
 --| name:    setkeyset
