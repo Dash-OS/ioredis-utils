@@ -37,6 +37,7 @@ function mSetKeySet() {
     ]),
   );
 }
+// [ 'OK', 'OK', 'OK' ]
 ```
 
 ### delkeyset
@@ -46,12 +47,18 @@ function delKeySet() {
   // Removes the KeySet and all keys that are apart of it
   return redis.delkeyset('example:set');
 }
+/*
+  [ 0, 3, [ 'example:set:one', 'example:set:three', 'example:set:two' ] ]
+*/
 
 function delKeySetMembers() {
   // Removes the given members from the keyset.  If they exists on the keyset
   // then they are also removed.  They are not removed if not a member.
   return redis.delkeyset('example:set', 'example:set:one', 'example:set:three');
 }
+/*
+  [ 1, 2, [ 'example:set:one', 'example:set:three' ] ]
+*/
 ```
 
 ### getkeyset
@@ -61,6 +68,13 @@ function getKeySet() {
   // Gets all members in the keyset (their values), returns Map<key, value>
   return redis.getkeyset('example:set');
 }
+/*
+  Map {
+    'example:set:one' => { example: 'one' },
+    'example:set:three' => { example: 'three' },
+    'example:set:two' => { example: 'two' }
+  }
+*/
 ```
 
 ## Hash Utilities

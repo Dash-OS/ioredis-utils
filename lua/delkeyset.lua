@@ -10,7 +10,7 @@
     If the KeySet ends up being empty, it is also removed.
 
     Returns:
-    [ KeySetRemoved (1/0), TotalDeleted (n), Array<SetMembers> ]
+    [ RemainingMembers, TotalDeleted (n), Array<SetMembers> ]
 ]]
 --| name:    delkeyset
 --| dynamic: false
@@ -20,13 +20,13 @@ local SetKey = KEYS[1]
 local RemoveKeys = {}
 local RemovingSet = false
 
-if #ARGV > 0 then
-  local TotalMembers = redis.call("SCARD", SetKey)
-  if TotalMembers == 0 then
-    redis.call("DEL", SetKey)
-    return {0, RemoveKeys}
-  end
+local TotalMembers = redis.call("SCARD", SetKey)
+if TotalMembers == 0 then
+  redis.call("DEL", SetKey)
+  return {0, 0, RemoveKeys}
+end
 
+if #ARGV > 0 then
   local RKPosition = 0
 
   for i = 1, #ARGV do
@@ -55,4 +55,4 @@ else
   TotalDeleted = redis.call("DEL", unpack(RemoveKeys))
 end
 
-return {RemovingSet, TotalDeleted, RemoveKeys}
+return {TotalMembers - TotalDeleted, TotalDeleted, RemoveKeys}

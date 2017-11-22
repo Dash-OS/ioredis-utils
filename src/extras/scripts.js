@@ -13,8 +13,59 @@ const descriptors: Array<File$SimpleData> = [
       name: 'delkeyset',
       ext: '.lua',
     },
-    data: 'local SetKey = KEYS[1]\n\nlocal RemoveKeys = {}\nlocal RemovingSet = false\n\nif #ARGV > 0 then\n  local TotalMembers = redis.call(\"SCARD\", SetKey)\n  if TotalMembers == 0 then\n    redis.call(\"DEL\", SetKey)\n    return {0, RemoveKeys}\n  end\n\n  local RKPosition = 0\n\n  for i = 1, #ARGV do\n    local MemberKey = ARGV[i]\n    local IsMember = redis.call(\"SISMEMBER\", SetKey, MemberKey)\n    if IsMember == 1 then\n      RKPosition = RKPosition + 1\n      RemoveKeys[RKPosition] = MemberKey\n    end\n  end\n\n  if RKPosition == TotalMembers then\n    RemovingSet = true\n  else\n    redis.call(\"SREM\", SetKey, unpack(RemoveKeys))\n  end\nelse\n  RemoveKeys = redis.call(\"SMEMBERS\", SetKey)\n  RemovingSet = true\nend\n\nlocal TotalDeleted\nif RemovingSet then\n  TotalDeleted = redis.call(\"DEL\", SetKey, unpack(RemoveKeys)) - 1\nelse\n  TotalDeleted = redis.call(\"DEL\", unpack(RemoveKeys))\nend\n\nreturn {RemovingSet, TotalDeleted, RemoveKeys}',
+    data: 'local SetKey = KEYS[1]\n\nlocal RemoveKeys = {}\nlocal RemovingSet = false\n\nlocal TotalMembers = redis.call(\"SCARD\", SetKey)\nif TotalMembers == 0 then\n  redis.call(\"DEL\", SetKey)\n  return {1, 0, RemoveKeys}\nend\n\nif #ARGV > 0 then\n  local RKPosition = 0\n\n  for i = 1, #ARGV do\n    local MemberKey = ARGV[i]\n    local IsMember = redis.call(\"SISMEMBER\", SetKey, MemberKey)\n    if IsMember == 1 then\n      RKPosition = RKPosition + 1\n      RemoveKeys[RKPosition] = MemberKey\n    end\n  end\n\n  if RKPosition == TotalMembers then\n    RemovingSet = true\n  else\n    redis.call(\"SREM\", SetKey, unpack(RemoveKeys))\n  end\nelse\n  RemoveKeys = redis.call(\"SMEMBERS\", SetKey)\n  RemovingSet = true\nend\n\nlocal TotalDeleted\nif RemovingSet then\n  TotalDeleted = redis.call(\"DEL\", SetKey, unpack(RemoveKeys)) - 1\nelse\n  TotalDeleted = redis.call(\"DEL\", unpack(RemoveKeys))\nend\n\nreturn {TotalMembers - TotalDeleted, TotalDeleted, RemoveKeys}',
     params: {"name":"delkeyset","dynamic":false,"keys":["KeySet"]},
+  },
+  {
+    descriptor: {
+      file: 'getkeyset.lua',
+      name: 'getkeyset',
+      ext: '.lua',
+    },
+    data: 'local SetKey     = KEYS[1]\nlocal SetKeyType = KEYS[2]\n\nif not SetKeyType then\n  SetKeyType = \'hash\'\nend\n\nlocal ResponseTable = { SetKeyType }\nlocal SetMembers = redis.call(\"SMEMBERS\", SetKey)\n\nif #SetMembers == 0 then return ResponseTable end\n\nlocal Get = {\n  string = function(key)\n    return redis.call(\"GET\", key)\n  end,\n  hash = function(key)\n    return redis.call(\"HGETALL\", key)\n  end,\n  set = function(key)\n    return redis.call(\"SMEMBERS\", key)\n  end\n}\n\nfor _,v in pairs(SetMembers) do\n  local i = #ResponseTable\n  ResponseTable[i + 1] = v\n  ResponseTable[i + 2] = Get[SetKeyType](v)\nend\n\nreturn ResponseTable',
+    params: {"name":"getkeyset","dynamic":true,"keys":["key","type"]},
+    transforms: {
+        args: args => {
+  if (args.length === 1) {
+    return [1, ...args]
+  } else if (args.length === 2) {
+    return [2, ...args]
+  } else {
+    throw new Error(`[REDIS] | Invalid # of Keys: ${args.length}`)
+  }
+},
+        result: result => {
+  if (!Array.isArray(result)) return result;
+  const type = result.shift();
+  const response = new Map()
+  for (let i = 0; i < result.length / 2; i += 1) {
+    const idx = i * 2
+    const key = result[idx]
+    const val = result[idx + 1]
+    switch(type) {
+      case 'hash': {
+        const hash = {}
+        for (let i2 = 0; i2 < val.length / 2; i2 += 1) {
+          const idx2 = i2 * 2
+          hash[ val[idx2] ] = val[idx2 + 1]
+        }
+        response.set(key, hash);
+        break
+      }
+      case 'string': {
+        response.set(key, val)
+        break;
+      }
+      case 'set': {
+        response.set(key, new Set(val))
+        break;
+      }
+    }
+  }
+  return response;
+},
+    },
+    
   },
   {
     descriptor: {
@@ -138,57 +189,6 @@ const descriptors: Array<File$SimpleData> = [
   },
   {
     descriptor: {
-      file: 'getkeyset.lua',
-      name: 'getkeyset',
-      ext: '.lua',
-    },
-    data: 'local SetKey     = KEYS[1]\nlocal SetKeyType = KEYS[2]\n\nif not SetKeyType then\n  SetKeyType = \'hash\'\nend\n\nlocal ResponseTable = { SetKeyType }\nlocal SetMembers = redis.call(\"SMEMBERS\", SetKey)\n\nif #SetMembers == 0 then return ResponseTable end\n\nlocal Get = {\n  string = function(key)\n    return redis.call(\"GET\", key)\n  end,\n  hash = function(key)\n    return redis.call(\"HGETALL\", key)\n  end,\n  set = function(key)\n    return redis.call(\"SMEMBERS\", key)\n  end\n}\n\nfor _,v in pairs(SetMembers) do\n  local i = #ResponseTable\n  ResponseTable[i + 1] = v\n  ResponseTable[i + 2] = Get[SetKeyType](v)\nend\n\nreturn ResponseTable',
-    params: {"name":"getkeyset","dynamic":true,"keys":["key","type"]},
-    transforms: {
-        args: args => {
-  if (args.length === 1) {
-    return [1, ...args]
-  } else if (args.length === 2) {
-    return [2, ...args]
-  } else {
-    throw new Error(`[REDIS] | Invalid # of Keys: ${args.length}`)
-  }
-},
-        result: result => {
-  if (!Array.isArray(result)) return result;
-  const type = result.shift();
-  const response = new Map()
-  for (let i = 0; i < result.length / 2; i += 1) {
-    const idx = i * 2
-    const key = result[idx]
-    const val = result[idx + 1]
-    switch(type) {
-      case 'hash': {
-        const hash = {}
-        for (let i2 = 0; i2 < val.length / 2; i2 += 1) {
-          const idx2 = i2 * 2
-          hash[ val[idx2] ] = val[idx2 + 1]
-        }
-        response.set(key, hash);
-        break
-      }
-      case 'string': {
-        response.set(key, val)
-        break;
-      }
-      case 'set': {
-        response.set(key, new Set(val))
-        break;
-      }
-    }
-  }
-  return response;
-},
-    },
-    
-  },
-  {
-    descriptor: {
       file: 'msetkeyset.lua',
       name: 'msetkeyset',
       ext: '.lua',
@@ -214,7 +214,7 @@ const descriptors: Array<File$SimpleData> = [
       switch(typeof value) {
         case 'number':
         case 'string': {
-          keys.push('string', args.length + 1, value, ...args);
+          keys.push('string', 1, value);
           break;
         }
         case 'object': {
