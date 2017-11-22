@@ -34,6 +34,7 @@ declare module 'ioredis' {
   declare type CustomOpts = {|
     ttl?: number,
     expires?: number,
+    keyset?: string,
   |};
 
   declare type GetKeysTypes = {
@@ -115,24 +116,45 @@ declare module 'ioredis' {
       opts?: CustomOpts,
     ): Promise<{ ...IFE, ...TSE, [key: string]: * }>;
 
-    getkeysinset<K: string>(
+    getkeyset<K: string>(
       setKey: K,
     ): Promise<Map<string, { [key: string]: string }>>;
 
-    getkeysinset<K: string>(
+    getkeyset<K: string>(
       setKey: K,
       type: 'hash',
     ): Promise<Map<string, { [key: string]: string }>>;
 
-    getkeysinset<K: string>(
+    getkeyset<K: string>(
       setKey: K,
       type: 'string',
     ): Promise<Map<string, string>>;
 
-    getkeysinset<K: string>(
+    getkeyset<K: string>(
       setKey: K,
       type: 'set',
     ): Promise<Map<string, Set<string>>>;
+
+    setkeyset<KS: string, K: string, V: mixed>(
+      setKey: KS,
+      key: K,
+      value: V,
+      ...args: Array<*>
+    ): Promise<Redis$SimpleResult>;
+
+    msetkeyset<KS: string>(
+      setKey: KS,
+      map: Map<
+        string,
+        | string
+        | number
+        | { [key: string]: * }
+        | Set<string | number>
+        | Array<string | number>,
+      >,
+    ): Promise<Array<Redis$SimpleResult>>;
+
+    delkeyset<K: string>(setKey: K): Promise<number>;
 
     // NOTE: These are complete, replacing the stubbed versions
     //       underneath them.
@@ -529,12 +551,34 @@ declare module 'ioredis' {
       ...args: Array<string>
     ): Redis$Pipeline<null | Array<string>, A, B, C, D, E, F, G, H>,
 
-    getkeysinset<K: string, T: 'hash' | 'string' | 'set'>(
+    getkeyset<K: string, T: 'hash' | 'string' | 'set'>(
       setKey: K,
       type?: T,
     ): Redis$Pipeline<Map<string, *>, A, B, C, D, E, F, G, H>,
+
+    delkeyset<K: string>(
+      setKey: K,
+    ): Redis$Pipeline<number, A, B, C, D, E, F, G, H>,
     // hmget(...args: any[]): Redis$Pipeline<A, B, C, D, E, F, G, H, I>,
 
+    setkeyset<KS: string, K: string, V: mixed>(
+      setKey: KS,
+      key: K,
+      value: V,
+      ...args: Array<*>
+    ): Redis$Pipeline<Redis$SimpleResult, A, B, C, D, E, F, G, H>,
+
+    msetkeyset<KS: string>(
+      setKey: KS,
+      map: Map<
+        string,
+        | string
+        | number
+        | { [key: string]: * }
+        | Set<string | number>
+        | Array<string | number>,
+      >,
+    ): Redis$Pipeline<Array<Redis$SimpleResult>, A, B, C, D, E, F, G, H>,
     // hsetifeq<K: string, F, V>(
     //   key: K,
     //   field: F,

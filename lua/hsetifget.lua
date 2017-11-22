@@ -38,6 +38,10 @@
             p.push(`@EXIN`, args[3][key]);
             break;
           }
+          case 'keyset': {
+            p.push(`@KSET`, args[3][key])
+            break
+          }
           default: {
             throw new Error(`Unknown hsetifget Parameter ${key}`);
           }
@@ -79,12 +83,18 @@ local PROPS = {
   -- expire in
   ['@EXIN'] = function(ms)
     return redis.call('PEXPIRE', HashKey, ms)
-  end
+  end,
+  ['@KSET'] = function(kset)
+    return redis.call('SADD', kset, HashKey)
+  end,
 }
 
 local CheckKeys = {}
 local RequestProps = {}
 local CheckTable = {}
+
+-- NOTE: Speed Hack
+local CKPosition = 0
 
 for i=1,#KEYS/2 do
   local k = KEYS[i * 2 - 1]
@@ -92,7 +102,8 @@ for i=1,#KEYS/2 do
   if PROPS[k] then
     RequestProps[k] = v
   else
-    table.insert(CheckKeys, k)
+    CKPosition = CKPosition + 1
+    CheckKeys[CKPosition] = k
     CheckTable[k] = v
   end
 end

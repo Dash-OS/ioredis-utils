@@ -17,7 +17,7 @@
     hash   === Map<string, { [key: string]: string }>
     string === Map<string, string>
 ]]
---| name:    getkeysinset
+--| name:    getkeyset
 --| dynamic: true
 --| keys:    key type
 --[[args => {
@@ -59,15 +59,15 @@
   }
   return response;
 }]]
+-- TODO: Make it so that one can pass ARGV values to specify the  members to remove
+local SetKey     = KEYS[1]
+local SetKeyType = KEYS[2]
 
-local SetKey = KEYS[1]
-local Type = KEYS[2]
-
-if not Type then
-  Type = 'hash'
+if not SetKeyType then
+  SetKeyType = 'hash'
 end
 
-local ResponseTable = { Type }
+local ResponseTable = { SetKeyType }
 local SetMembers = redis.call("SMEMBERS", SetKey)
 
 if #SetMembers == 0 then return ResponseTable end
@@ -85,8 +85,9 @@ local Get = {
 }
 
 for _,v in pairs(SetMembers) do
-  table.insert(ResponseTable, v)
-  table.insert(ResponseTable, Get[Type](v))
+  local i = #ResponseTable
+  ResponseTable[i + 1] = v
+  ResponseTable[i + 2] = Get[SetKeyType](v)
 end
 
 return ResponseTable
